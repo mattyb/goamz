@@ -54,7 +54,10 @@ type TableDescriptionT struct {
 	TableStatus             string
 }
 
-
+type ConsumedCapacity struct {
+  CapacityUnits float32
+  TableName string
+}
 
 func (s *Server) NewTable(name string, key PrimaryKey) *Table {
 	return &Table{s, name, key}

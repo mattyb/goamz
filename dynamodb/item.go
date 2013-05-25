@@ -6,30 +6,38 @@ import (
 	"fmt"
 )
 
-func (t *Table) GetItem(hashKey string, rangeKey string) (map[string]*Attribute, error) {
+func (t *Table) GetItem(hashKey string, rangeKey string) (map[string]*Attribute, error, *float64) {
 	q := NewQuery(t)
 	q.AddKey(t, hashKey, rangeKey)
 
 	jsonResponse, err := t.Server.queryServer(target("GetItem"), q)
 
 	if err != nil {
-		return nil, err
+		return nil, err, nil
 	}
 
 	json, err := simplejson.NewJson(jsonResponse)
 
 	if err != nil {
-		return nil, err
+		return nil, err, nil
 	}
 
 	item, err := json.Get("Item").Map()
+    fmt.Printf("Response %s", jsonResponse)
 
 	if err != nil {
 		message := fmt.Sprintf("Unexpected response %s", jsonResponse)
-		return nil, errors.New(message)
+		return nil, errors.New(message), nil
 	}
 
-	return parseAttributes(item), nil
+    cap_val, _ := json.Get("ConsumedCapacityUnits").Float64()
+	//capacity = &make(ConsumedCapacity)
+    /*if err != nil {
+        //capacity := make(ConsumedCapacity)
+    } else {
+        capacity = nil
+    }*/
+	return parseAttributes(item), nil, &cap_val
 
 }
 
