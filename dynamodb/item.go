@@ -48,7 +48,7 @@ func (t *Table) PutItem(hashKey string, rangeKey string, attributes []Attribute)
 	}
 
 	q := NewQuery(t)
-	
+
 	keys := t.Key.Clone(hashKey, rangeKey)
 	attributes = append(attributes, keys...)
 
@@ -106,7 +106,7 @@ func (t *Table) AddItem(hashKey string, rangeKey string, attributes []Attribute)
 	}
 
 	return true, nil
-	
+
 }
 
 func parseAttributes(s map[string]interface{}) map[string]*Attribute {
@@ -115,26 +115,59 @@ func parseAttributes(s map[string]interface{}) map[string]*Attribute {
 	for key, value := range s {
 		if v, ok := value.(map[string]interface{}); ok {
 			if val, ok := v[TYPE_STRING].(string); ok {
-				attr := &Attribute{
-					TYPE_STRING,
-					key,
-					val,
+				results[key] = &Attribute{
+					Type:  TYPE_STRING,
+					Name:  key,
+					Value: val,
 				}
-				results[key] = attr
 			} else if val, ok := v[TYPE_NUMBER].(string); ok {
-				attr := &Attribute{
-					TYPE_NUMBER,
-					key,
-					val,
+				results[key] = &Attribute{
+					Type:  TYPE_NUMBER,
+					Name:  key,
+					Value: val,
 				}
-				results[key] = attr
 			} else if val, ok := v[TYPE_BINARY].(string); ok {
-				attr := &Attribute{
-					TYPE_BINARY,
-					key,
-					val,
+				results[key] = &Attribute{
+					Type:  TYPE_BINARY,
+					Name:  key,
+					Value: val,
 				}
-				results[key] = attr
+			} else if vals, ok := v[TYPE_STRING_SET].([]interface{}); ok {
+				arry := make([]string, len(vals))
+				for i, ivalue := range vals {
+					if val, ok := ivalue.(string); ok {
+						arry[i] = val
+					}
+				}
+				results[key] = &Attribute{
+					Type:      TYPE_STRING_SET,
+					Name:      key,
+					SetValues: arry,
+				}
+			} else if vals, ok := v[TYPE_NUMBER_SET].([]interface{}); ok {
+				arry := make([]string, len(vals))
+				for i, ivalue := range vals {
+					if val, ok := ivalue.(string); ok {
+						arry[i] = val
+					}
+				}
+				results[key] = &Attribute{
+					Type:      TYPE_NUMBER_SET,
+					Name:      key,
+					SetValues: arry,
+				}
+			} else if vals, ok := v[TYPE_BINARY_SET].([]interface{}); ok {
+				arry := make([]string, len(vals))
+				for i, ivalue := range vals {
+					if val, ok := ivalue.(string); ok {
+						arry[i] = val
+					}
+				}
+				results[key] = &Attribute{
+					Type:      TYPE_BINARY_SET,
+					Name:      key,
+					SetValues: arry,
+				}
 			}
 		} else {
 			fmt.Printf("type assertion to map[string] interface{} failed for : %s\n ", value)
